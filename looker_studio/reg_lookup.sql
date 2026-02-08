@@ -5,7 +5,7 @@ WITH vehicle_data AS (
     make,
     model,
     primaryColour
-  FROM `motwot.motwot_v2.motwot_v2_enriched`
+  FROM `motwot.motwot_v2.motwot_main_enriched`
   WHERE registration = @reg_input
   LIMIT 1
 )
