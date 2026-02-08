@@ -10,3 +10,7 @@ OPTIONS(
   clean_spikes_and_dips = TRUE
 ) AS
 SELECT * FROM `motwot_v2.daily_counts`
+WHERE test_date >= '1950-01-01'
+
+-- evalute
+-- SELECT * FROM ML.ARIMA_EVALUATE(MODEL `motwot_v2.pass_fail_forecast_model`) 
