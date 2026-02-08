@@ -3,10 +3,10 @@ OPTIONS(
   model_type = 'ARIMA_PLUS',
   time_series_timestamp_col = 'test_date',
   time_series_data_col = 'count',
-  time_series_id_col = 'result_type', -- THIS IS THE KEY: it predicts Pass and Fail separately
+  time_series_id_col = 'result_type', 
   holiday_region = 'GB', 
   auto_arima = TRUE,
   data_frequency = 'DAILY',
-  clean_spikes_and_dips = TRUE -- Good for MOT data if a garage was closed unexpectedly
+  clean_spikes_and_dips = TRUE
 ) AS
 SELECT * FROM `motwot_v2.daily_counts`
