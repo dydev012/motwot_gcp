@@ -11,7 +11,7 @@ SELECT
   UPPER(make) AS make,
   UPPER(model) AS model,
   UPPER(primaryColour) AS primaryColour
-FROM `motwot_v2.motwot_v2_enriched`
+FROM `motwot_v2.motwot_main_enriched`
 WHERE last_test_result IN ('PASSED', 'FAILED')
   AND mileage IS NOT NULL 
   AND vehicle_age IS NOT NULL
