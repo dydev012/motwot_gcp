@@ -1,8 +1,8 @@
 from pathlib import Path
-from data_puller import DataPuller
-from data_processor import DataProcessor
-from gcp_upload import GCPUploader
-from _base import DATA_DIR
+from data_runner.data_puller import DataPuller
+from data_runner.data_processor import DataProcessor
+from data_runner.gcp_upload import GCPUploader
+from data_runner._base import DATA_DIR
 
 DATASET_ID = "motwot_v2"
 TABLE_ID = "motwot_v2"

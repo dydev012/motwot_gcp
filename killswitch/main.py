@@ -60,9 +60,7 @@ def stop_billing(cloud_event: CloudEvent) -> None:
     PROJECT_ID = get_project_id()
     PROJECT_NAME = f"projects/{PROJECT_ID}"
 
-    event_data = base64.b64decode(
-        cloud_event.data["message"]["data"]
-    ).decode("utf-8")
+    event_data = base64.b64decode(cloud_event.data["message"]["data"]).decode("utf-8")
 
     event_dict = json.loads(event_data)
     cost_amount = event_dict["costAmount"]
@@ -78,10 +76,7 @@ def stop_billing(cloud_event: CloudEvent) -> None:
     is_billing_enabled = _is_billing_enabled(PROJECT_NAME)
 
     if is_billing_enabled:
-        _disable_billing_for_project(
-            PROJECT_NAME,
-            SIMULATE_DEACTIVATION
-        )
+        _disable_billing_for_project(PROJECT_NAME, SIMULATE_DEACTIVATION)
     else:
         print("Billing is already disabled.")
 
@@ -101,7 +96,7 @@ def _is_billing_enabled(project_name: str) -> bool:
 
         return response.billing_enabled
     except Exception as e:
-        print(f'Error getting billing info: {e}')
+        print(f"Error getting billing info: {e}")
         print(
             "Unable to determine if billing is enabled on specified project, "
             "assuming billing is enabled."
@@ -137,13 +132,10 @@ def _disable_billing_for_project(
     # https://cloud.google.com/billing/docs/reference/rest/v1/projects/updateBillingInfo
     try:
         # To disable billing set the `billing_account_name` field to empty
-        project_billing_info = billing_v1.ProjectBillingInfo(
-            billing_account_name=""
-        )
+        project_billing_info = billing_v1.ProjectBillingInfo(billing_account_name="")
 
         response = billing_client.update_project_billing_info(
-            name=project_name,
-            project_billing_info=project_billing_info
+            name=project_name, project_billing_info=project_billing_info
         )
 
         entry_text = f"Billing disabled: {response}"
