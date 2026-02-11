@@ -6,6 +6,7 @@ from google.oauth2 import service_account
 from tqdm import tqdm
 from data_runner._base import ENV
 
+
 class GCPUploader(ENV):
     def __init__(self, dataset_id, main_table_id):
         ENV.__init__(self)
@@ -23,6 +24,17 @@ class GCPUploader(ENV):
         self.staging_table_ref = f"{self.main_table_ref}_staging"  # for deltas
         self.client = bigquery.Client(
             credentials=self.credentials, project=self.project_id
+        )
+
+        merge_template_path = Path(__file__).parent / "merge_delta.sql"
+        with open(merge_template_path, "r") as f:
+            self.merge_template = f.read()
+
+        self.merge_template = self.merge_template.replace(
+            "!!main!!", self.main_table_ref
+        )
+        self.merge_template = self.merge_template.replace(
+            "!!staging!!", self.staging_table_ref
         )
 
     def _load_to_table(
@@ -83,37 +95,22 @@ class GCPUploader(ENV):
         )
         print(f"Loaded {job.output_rows} rows successfully.")
 
-    def merge_delta(self, file_path, limit=None):
+    def merge_delta(self, file_path, limit=None, no_merge=True, append_staging=False):
         # 1 — Load delta into staging table (truncate each run)
         job = self._load_to_table(
             file_path,
             self.staging_table_ref,
-            bigquery.WriteDisposition.WRITE_TRUNCATE,
+            bigquery.WriteDisposition.WRITE_TRUNCATE if not append_staging else bigquery.WriteDisposition.WRITE_APPEND,
             limit,
         )
         print(f"Staged {job.output_rows} rows.")
 
-        # 2 — Build MERGE from staging schema (avoids hardcoding columns)
-        staging_table = self.client.get_table(self.staging_table_ref)
-        columns = [
-            field.name for field in staging_table.schema if field.name != "registration"
-        ]
-        update_clause = ", ".join(f"main.{c} = delta.{c}" for c in columns)
+        if no_merge:
+            return
 
-        merge_sql = f"""
-        MERGE `{self.main_table_ref}` AS main
-        USING `{self.staging_table_ref}` AS delta
-        ON main.registration = delta.registration
-        WHEN MATCHED AND delta.modification = 'DELETED' THEN
-            DELETE
-        WHEN MATCHED AND delta.modification IN ('UPDATED', 'CREATED') THEN
-            UPDATE SET {update_clause}
-        WHEN NOT MATCHED AND delta.modification IN ('CREATED', 'UPDATED') THEN
-            INSERT ROW
-        """
-
+        # 2 - Merge
         print("Running MERGE...")
-        merge_job = self.client.query(merge_sql)
+        merge_job = self.client.query(self.merge_template)
         merge_job.result()
         stats = merge_job.num_dml_affected_rows
         print(f"MERGE complete — {stats} rows affected.")
