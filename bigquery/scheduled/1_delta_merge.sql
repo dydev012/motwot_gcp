@@ -10,6 +10,12 @@ USING (
         (SELECT COUNT(*) FROM UNNEST(motTests) AS t WHERE t.testResult = 'FAILED') AS fail_count
     FROM `motwot.motwot_v2.motwot_main_enriched_staging`
     WHERE modification IN ('CREATED', 'UPDATED', 'DELETED')
+
+    -- Dedupe reg
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY registration 
+        ORDER BY lastMotTestDate DESC
+    ) = 1
 ) AS delta
 ON main.registration = delta.registration
 

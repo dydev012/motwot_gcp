@@ -94,6 +94,14 @@ You'll also need `google-cloud-bigquery` and `google-auth`:
 pip install google-cloud-bigquery google-auth
 ```
 
+Creating google cloud service tokens
+
+```bash
+gcloud iam service-accounts list
+gcloud iam service-accounts keys create token_cache.json \
+    --iam-account=<SERVICE_EMAIL>
+```
+
 ## Usage
 
 ### Daily Delta Run
