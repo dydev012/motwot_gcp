@@ -1,23 +1,23 @@
 import io
 import os
+from pathlib import Path
 from google.cloud import bigquery
 from google.oauth2 import service_account
 from tqdm import tqdm
 from data_runner._base import ENV
 
-
 class GCPUploader(ENV):
-    def __init__(self, dataset_id, table_id):
+    def __init__(self, dataset_id, main_table_id):
         ENV.__init__(self)
 
         self.project_id = os.environ.get("GCP_PROJECT")
-        key_path = os.environ.get("GCP_SERVICE_CREDENTIALS")
+        key_path = os.environ.get("GCP_SERVICE_CREDS_PATH")
 
         self.credentials = service_account.Credentials.from_service_account_file(
-            key_path
+            os.path.join(Path(__file__).parent, key_path)
         )
         self.dataset_id = dataset_id
-        self.table_id = table_id
+        self.table_id = main_table_id
 
         self.main_table_ref = f"{self.project_id}.{self.dataset_id}.{self.table_id}"
         self.staging_table_ref = f"{self.main_table_ref}_staging"  # for deltas
@@ -144,6 +144,6 @@ if __name__ == "__main__":
     dataset_id = "motwot_v2"
     table_id = "motwot_main"
 
-    uploader = GCPUploader(dataset_id=dataset_id, table_id=table_id)
+    uploader = GCPUploader(dataset_id=dataset_id, main_table_id=table_id)
     uploader.create_table("data/bulk-light-vehicle_02-02-2026.json", limit=10000)
     # uploader.fetch_and_load("data/delta-light-vehicle_06-02-2026.json", limit=3000)

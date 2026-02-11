@@ -2,6 +2,7 @@ __pycache__
 .env
 mot-service-account-key.json
 token_cache.json
+gcp_sk.json
 data/
 .claude
 

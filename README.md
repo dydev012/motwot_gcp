@@ -80,7 +80,7 @@ cp .env.template .env
 | `MOT_TOKEN_URL` | Azure AD token endpoint |
 | `API_EMAIL` | Registered email address |
 | `GCP_PROJECT` | Google Cloud project ID |
-| `GCP_SERVICE_CREDENTIALS` | Path to GCP service account JSON key |
+| `GCP_SERVICE_CREDS_PATH` | Path to GCP service account JSON key |
 
 ### Install Dependencies
 
