@@ -9,4 +9,4 @@ class ENV:
     def __init__(self, **kwargs):
         envdir = Path(__file__).parent.parent
         print(envdir)
-        load_dotenv(os.path.join(envdir, ".env"), override=True)
+        load_dotenv(os.path.join(envdir, ".env"), override=False)

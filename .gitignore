@@ -5,6 +5,7 @@ token_cache.json
 gcp_sk.json
 data/
 .claude
+sandbox.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

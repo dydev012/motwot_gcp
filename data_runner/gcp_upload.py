@@ -1,4 +1,5 @@
 import io
+import json
 import os
 from pathlib import Path
 from google.cloud import bigquery
@@ -12,10 +13,9 @@ class GCPUploader(ENV):
         ENV.__init__(self)
 
         self.project_id = os.environ.get("GCP_PROJECT")
-        key_path = os.environ.get("GCP_SERVICE_CREDS_PATH")
-
-        self.credentials = service_account.Credentials.from_service_account_file(
-            os.path.join(Path(__file__).parent, key_path)
+        creds_json = json.loads(os.environ["GCP_SERVICE_CREDS"])
+        self.credentials = service_account.Credentials.from_service_account_info(
+            creds_json
         )
         self.dataset_id = dataset_id
         self.table_id = main_table_id
