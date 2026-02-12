@@ -35,3 +35,7 @@ def perform_weekly_delta_merge():
 def weekly_delta_merge(background_tasks: BackgroundTasks):
     background_tasks.add_task(perform_weekly_delta_merge)
     return {"status": "started"}
+
+@app.get("/health-check")
+def health_check():
+    return {"status": "healthy"}
