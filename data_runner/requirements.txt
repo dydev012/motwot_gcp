@@ -3,7 +3,7 @@ protobuf
 python-dotenv==1.2.1
 Requests==2.32.5
 tqdm==4.67.3
-google-cloud-bigquery==3.4.0
+google-cloud-bigquery>=3.20,<4
 google-auth==2.48.0
 numpy<2
 fastapi[standard]==0.115.0
