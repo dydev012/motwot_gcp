@@ -43,7 +43,7 @@ class DataPuller:
         return data
 
     def _download_file(self, url: str, dest: Path, total_size: int = 0) -> None:
-        resp = requests.get(url, stream=True)
+        resp = requests.get(url, stream=True, timeout=120)
         resp.raise_for_status()
         total = int(resp.headers.get("content-length", total_size))
         with (
@@ -56,16 +56,27 @@ class DataPuller:
 
     def _download_entries(self, entries: list[dict], label: str) -> list[Path]:
         downloaded = []
-        for entry in entries:
+        i = 0
+        while i < len(entries):
+            entry = entries[i]
             filename = Path(entry["filename"]).name
             dest = self.data_dir / filename
             if dest.exists():
                 logger.info("Skipping %s (already exists)", filename)
                 downloaded.append(dest)
+                i += 1
                 continue
-            self._download_file(entry["downloadUrl"], dest, entry.get("fileSize", 0))
+            try:
+                self._download_file(entry["downloadUrl"], dest, entry.get("fileSize", 0))
+            except requests.exceptions.HTTPError as exc:
+                if exc.response is not None and exc.response.status_code == 403:
+                    logger.warning("Presigned URL expired for %s, refreshing manifest", filename)
+                    entries = self.pull().get(label, [])
+                    continue
+                raise
             logger.info("Saved %s", dest)
             downloaded.append(dest)
+            i += 1
         logger.info("Downloaded %d / %d %s files", len(downloaded), len(entries), label)
         return downloaded
 
