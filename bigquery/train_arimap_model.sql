@@ -15,6 +15,13 @@ SELECT
     SUM(count) AS count
 FROM `motwot_v2.daily_counts`
 WHERE DATE(test_date) >= DATE_SUB(CURRENT_DATE(), INTERVAL 3 YEAR)
+  AND DATE(test_date) <= (
+    SELECT DATE(MAX(test_date)) FROM `motwot_v2.daily_counts`
+    WHERE test_date IN (
+      SELECT test_date FROM `motwot_v2.daily_counts`
+      GROUP BY test_date HAVING COUNT(DISTINCT result_type) = 2
+    )
+  )
 GROUP BY 1, 2
 
 -- evalute

@@ -6,7 +6,7 @@ WITH combined_data AS (
     CONCAT(result_type, ' - ACTUAL') AS chart_series,
     count
   FROM `motwot_v2.daily_counts`
-  WHERE DATE(test_date) < CURRENT_DATE() 
+  WHERE DATE(test_date) < CURRENT_DATE()
 
   UNION ALL
 
@@ -14,7 +14,7 @@ WITH combined_data AS (
   SELECT 
     DATE(forecast_timestamp) AS test_date, 
     CONCAT(result_type, ' - FORECAST') AS chart_series, 
-    forecast_value AS count
+    GREATEST(forecast_value, 0) AS count
   FROM ML.FORECAST(MODEL `motwot_v2.pass_fail_forecast_model`, STRUCT(30 AS horizon))
   WHERE DATE(forecast_timestamp) >= CURRENT_DATE()
 )
