@@ -6,6 +6,7 @@ gcp_sk.json
 data/
 .claude
 sandbox.py
+*.b64
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

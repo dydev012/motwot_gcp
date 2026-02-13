@@ -1,3 +1,4 @@
+import base64
 import io
 import json
 import os
@@ -13,7 +14,11 @@ class GCPUploader(ENV):
         ENV.__init__(self)
 
         self.project_id = os.environ.get("GCP_PROJECT")
-        creds_json = json.loads(os.environ["GCP_SERVICE_CREDS"])
+        raw = os.environ["GCP_SERVICE_CREDS"]
+        try:
+            creds_json = json.loads(raw)
+        except json.JSONDecodeError:
+            creds_json = json.loads(base64.b64decode(raw))
         self.credentials = service_account.Credentials.from_service_account_info(
             creds_json
         )
